@@ -5,19 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MPThamst - Clicker Game</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
             --primary: #6C63FF;
             --secondary: #4A44C6;
             --accent: #FF6584;
+            --success: #00CC6A;
+            --warning: #FFD700;
             --dark: #1A1C2B;
             --darker: #0F1019;
             --light: #F5F5F7;
-            --bronze: #CD7F32;
-            --silver: #C0C0C0;
-            --gold: #FFD700;
-            --platinum: #E5E4E2;
         }
         
         * {
@@ -42,60 +39,36 @@
             padding-bottom: 80px;
         }
         
-        /* Шапка с фоткой */
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-            position: relative;
-        }
-        
-        .profile-container {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 15px;
-        }
-        
-        .profile-img {
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid var(--primary);
-            box-shadow: 0 10px 30px rgba(108, 99, 255, 0.4);
-        }
-        
-        .player-name {
-            font-size: 1.6em;
-            font-weight: bold;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-        }
-        
-        /* Бейдж ранга */
-        .rank-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-weight: bold;
-            font-size: 1.1em;
+        /* Вкладки */
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 5px;
             margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            overflow-x: auto;
         }
         
-        .rank-badge.bronze {
-            background: linear-gradient(135deg, var(--bronze), #8B4513);
+        .tab {
+            flex: 1;
+            padding: 12px 10px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            white-space: nowrap;
         }
         
-        .rank-badge.platinum {
-            background: linear-gradient(135deg, var(--platinum), #C0C0C0);
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.4);
         }
         
-        /* Карточка баланса */
-        .balance-card {
+        /* Основной экран */
+        .main-screen {
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(15px);
             border-radius: 20px;
@@ -103,12 +76,29 @@
             margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
         }
         
-        .balance-amount {
+        .profile-img {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary);
+            box-shadow: 0 10px 30px rgba(108, 99, 255, 0.4);
+            margin: 0 auto 15px;
+        }
+        
+        .player-name {
+            font-size: 1.6em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: white;
+        }
+        
+        .balance {
             font-size: 2.8em;
             font-weight: bold;
-            text-align: center;
             color: var(--accent);
             text-shadow: 0 2px 15px rgba(255, 101, 132, 0.5);
             margin: 15px 0;
@@ -116,31 +106,17 @@
         }
         
         .income-display {
-            text-align: center;
-            font-size: 1.1em;
-            margin-bottom: 20px;
-            padding: 12px;
             background: rgba(108, 99, 255, 0.15);
+            padding: 12px;
             border-radius: 12px;
+            margin: 15px 0;
         }
         
         .income-amount {
             font-size: 1.4em;
             font-weight: bold;
-            color: #00FF88;
+            color: var(--success);
             margin-top: 5px;
-        }
-        
-        /* Прогресс-бар энергии */
-        .energy-container {
-            margin: 20px 0;
-        }
-        
-        .energy-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 0.95em;
         }
         
         .energy-bar {
@@ -148,41 +124,30 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 11px;
             overflow: hidden;
+            margin: 15px 0;
             position: relative;
         }
         
         .energy-fill {
             height: 100%;
-            background: linear-gradient(90deg, #00FF88, #00CC6A);
+            background: linear-gradient(90deg, var(--success), #00A855);
             border-radius: 11px;
-            width: 96.2%;
+            width: 100%;
             position: relative;
-            transition: width 0.3s ease;
+            transition: width 0.5s ease;
         }
         
-        .energy-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.3), 
-                transparent);
-            animation: shine 2s infinite;
-        }
-        
-        @keyframes shine {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        .energy-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            margin-top: 5px;
         }
         
         /* Кнопка клика */
         .click-area {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            height: 210px;
+            height: 200px;
             border-radius: 25px;
             display: flex;
             align-items: center;
@@ -193,55 +158,31 @@
             position: relative;
             overflow: hidden;
             box-shadow: 0 15px 35px rgba(108, 99, 255, 0.4);
-            transition: all 0.1s;
         }
         
         .click-area:active {
             transform: scale(0.97);
-            box-shadow: 0 10px 25px rgba(108, 99, 255, 0.3);
         }
         
         .click-text {
             font-size: 2em;
             font-weight: bold;
-            text-align: center;
             text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            z-index: 2;
-        }
-        
-        .click-count {
-            position: absolute;
-            bottom: 15px;
-            right: 20px;
-            font-size: 1.1em;
-            opacity: 0.8;
         }
         
         /* Таймеры */
-        .timers-grid {
+        .timers {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin: 25px 0;
+            gap: 10px;
+            margin: 20px 0;
         }
         
         .timer-item {
             background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 15px;
+            padding: 12px;
+            border-radius: 12px;
             text-align: center;
-            transition: transform 0.3s;
-        }
-        
-        .timer-item:hover {
-            transform: translateY(-3px);
-            background: rgba(255, 255, 255, 0.08);
-        }
-        
-        .timer-icon {
-            font-size: 1.8em;
-            margin-bottom: 10px;
-            color: var(--primary);
         }
         
         .timer-label {
@@ -251,75 +192,116 @@
         }
         
         .timer-value {
-            font-size: 1.3em;
+            font-size: 1.2em;
             font-weight: bold;
-            color: #00FF88;
+            color: var(--warning);
             font-family: monospace;
         }
         
         /* Кнопки действий */
-        .actions-grid {
+        .actions {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 25px 0;
+            gap: 12px;
+            margin: 20px 0;
         }
         
         .action-btn {
             background: rgba(255, 255, 255, 0.12);
             border: none;
-            padding: 18px 12px;
-            border-radius: 18px;
+            padding: 15px 10px;
+            border-radius: 15px;
             color: white;
-            font-size: 1em;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .action-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255,255,255,0.2), 
-                transparent);
-            transition: left 0.5s;
-        }
-        
-        .action-btn:hover::before {
-            left: 100%;
+            gap: 8px;
         }
         
         .action-btn:hover {
             background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-3px);
+            transform: translateY(-2px);
         }
         
         .action-btn i {
-            font-size: 1.8em;
+            font-size: 1.6em;
         }
         
-        .action-btn.boost {
-            background: linear-gradient(135deg, var(--accent), #FF3366);
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
         
-        .action-btn.daily {
-            background: linear-gradient(135deg, #00CC6A, #00A855);
+        .modal-content {
+            background: var(--dark);
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
         
-        .action-btn.cipher {
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 1em;
+        }
+        
+        .form-btn {
+            width: 100%;
+            padding: 14px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 10px;
         }
         
         /* Статистика */
@@ -332,13 +314,13 @@
         
         .stat-item {
             background: rgba(255, 255, 255, 0.05);
-            padding: 18px;
+            padding: 15px;
             border-radius: 15px;
             text-align: center;
         }
         
         .stat-value {
-            font-size: 1.7em;
+            font-size: 1.6em;
             font-weight: bold;
             margin: 8px 0;
             color: var(--accent);
@@ -347,6 +329,51 @@
         .stat-label {
             font-size: 0.85em;
             opacity: 0.9;
+        }
+        
+        /* Прогресс бар */
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 4px;
+        }
+        
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .notification.error {
+            background: var(--accent);
+        }
+        
+        .notification.warning {
+            background: var(--warning);
+            color: var(--dark);
+        }
+        
+        @keyframes slideDown {
+            from { transform: translate(-50%, -100px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
         }
         
         /* Навигация */
@@ -361,7 +388,7 @@
             justify-content: space-around;
             padding: 15px 10px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 1000;
+            z-index: 999;
         }
         
         .nav-btn {
@@ -372,200 +399,212 @@
             text-decoration: none;
             font-size: 0.8em;
             transition: all 0.3s;
-            padding: 5px 10px;
-            border-radius: 12px;
+            padding: 5px;
+            border-radius: 10px;
         }
         
-        .nav-btn:hover, .nav-btn.active {
+        .nav-btn.active {
             color: var(--primary);
             background: rgba(108, 99, 255, 0.15);
         }
         
         .nav-btn i {
-            font-size: 1.5em;
-            margin-bottom: 5px;
-        }
-        
-        /* Индикатор буста */
-        .boost-indicator {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            color: var(--dark);
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-weight: bold;
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
-            display: none;
-            z-index: 1001;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        /* Адаптивность */
-        @media (max-width: 480px) {
-            .container {
-                padding-bottom: 85px;
-            }
-            
-            .balance-amount {
-                font-size: 2.4em;
-            }
-            
-            .click-area {
-                height: 190px;
-            }
-            
-            .profile-img {
-                width: 115px;
-                height: 115px;
-            }
-        }
-        
-        /* Эффекты */
-        .floating-text {
-            position: absolute;
-            pointer-events: none;
-            animation: floatUp 1s ease-out forwards;
-            font-weight: bold;
             font-size: 1.4em;
-            color: #00FF88;
-            text-shadow: 0 2px 10px rgba(0, 255, 136, 0.5);
-            z-index: 100;
-        }
-        
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+            margin-bottom: 5px;
         }
     </style>
 </head>
 <body>
-    <!-- Индикатор буста -->
-    <div class="boost-indicator" id="boostIndicator">
-        <i class="fas fa-bolt"></i> 2x BOOST ACTIVE
-    </div>
+    <!-- Уведомления -->
+    <div class="notification" id="notification"></div>
     
-    <div class="container">
-        <!-- Шапка с фоткой -->
-        <div class="header">
-            <div class="profile-container">
-                <img src="https://i.ibb.co/xtnhzyvV/foto.jpg" alt="MPThamst" class="profile-img" id="profileImg">
+    <!-- Модальное окно шифра -->
+    <div class="modal" id="cipherModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🔐 Ежедневный шифр</div>
+                <button class="close-btn" onclick="closeModal('cipherModal')">&times;</button>
             </div>
-            
-            <div class="player-name" id="playerName">MPThamst Player</div>
-            
-            <div class="rank-badge platinum" id="rankBadge">
-                <i class="fas fa-crown"></i>
-                <span id="rankText">Platinum > 4/10</span>
+            <div id="cipherContent">
+                <!-- Контент загружается динамически -->
             </div>
         </div>
-        
-        <!-- Карточка баланса -->
-        <div class="balance-card">
-            <div class="balance-amount" id="balance">52 089</div>
-            
-            <div class="income-display">
-                <div>Прибыль в час</div>
-                <div class="income-amount" id="hourlyIncome">+15,7K</div>
+    </div>
+    
+    <!-- Модальное окно добавления друга -->
+    <div class="modal" id="friendModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">👥 Добавить друга</div>
+                <button class="close-btn" onclick="closeModal('friendModal')">&times;</button>
             </div>
-            
-            <div class="energy-container">
-                <div class="energy-header">
-                    <span><i class="fas fa-bolt"></i> Энергия</span>
-                    <span id="energyText">962 / 1000</span>
+            <p style="margin-bottom: 15px; opacity: 0.9;">Введите username друга (без @)</p>
+            <div class="form-group">
+                <input type="text" class="form-input" id="friendUsername" placeholder="username">
+            </div>
+            <button class="form-btn" onclick="addFriend()">Добавить друга</button>
+            <div style="margin-top: 20px; padding: 15px; background: rgba(108, 99, 255, 0.1); border-radius: 10px;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: var(--primary);">🎁 Награды за друзей:</div>
+                <div>• +500 MPTC за каждого приглашенного</div>
+                <div>• Друг получает +200 MPTC</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Основной контейнер -->
+    <div class="container">
+        <!-- Вкладки -->
+        <div class="tabs" id="tabs">
+            <div class="tab active" data-tab="main">Главная</div>
+            <div class="tab" data-tab="stats">Статистика</div>
+            <div class="tab" data-tab="friends">Друзья</div>
+            <div class="tab" data-tab="shop">Магазин</div>
+            <div class="tab" data-tab="upgrades">Прокачка</div>
+        </div>
+        
+        <!-- Главный экран -->
+        <div id="mainTab" class="tab-content">
+            <div class="main-screen">
+                <img src="https://i.ibb.co/xtnhzyvV/foto.jpg" alt="MPThamst" class="profile-img" id="profileImg">
+                <div class="player-name" id="playerName">Загрузка...</div>
+                
+                <div class="balance" id="balance">0</div>
+                
+                <div class="income-display">
+                    <div>Прибыль в час</div>
+                    <div class="income-amount" id="hourlyIncome">+0</div>
                 </div>
+                
                 <div class="energy-bar">
                     <div class="energy-fill" id="energyFill"></div>
                 </div>
+                <div class="energy-text">
+                    <span>⚡ Энергия</span>
+                    <span id="energyText">100 / 100</span>
+                </div>
+                
+                <!-- Таймеры -->
+                <div class="timers">
+                    <div class="timer-item">
+                        <div class="timer-label">Ежедневная награда</div>
+                        <div class="timer-value" id="dailyTimer">24:00</div>
+                    </div>
+                    <div class="timer-item">
+                        <div class="timer-label">Ежедневный шифр</div>
+                        <div class="timer-value" id="cipherTimer">24:00</div>
+                    </div>
+                    <div class="timer-item">
+                        <div class="timer-label">Комбо</div>
+                        <div class="timer-value" id="comboTimer">24:00</div>
+                    </div>
+                </div>
+                
+                <!-- Кнопка клика -->
+                <div class="click-area" id="clickArea">
+                    <div class="click-text">НАЖМИ МЕНЯ!</div>
+                </div>
+                <div style="text-align: center; opacity: 0.8; margin-top: -15px; margin-bottom: 20px;">
+                    <span id="clickCount">0 кликов</span>
+                </div>
+                
+                <!-- Кнопки действий -->
+                <div class="actions">
+                    <button class="action-btn" onclick="claimDaily()">
+                        <i class="fas fa-gift"></i>
+                        Ежедневная награда
+                    </button>
+                    <button class="action-btn" onclick="showCipherModal()">
+                        <i class="fas fa-lock"></i>
+                        Ежедневный шифр
+                    </button>
+                    <button class="action-btn" onclick="buyBoost()" style="background: linear-gradient(135deg, var(--accent), #FF3366);">
+                        <i class="fas fa-bolt"></i>
+                        Boost
+                        <div style="font-size: 0.9em;">2500 MPTC</div>
+                    </button>
+                    <button class="action-btn" onclick="showFriendModal()">
+                        <i class="fas fa-user-plus"></i>
+                        Добавить друга
+                    </button>
+                </div>
             </div>
-        </div>
-        
-        <!-- Таймеры -->
-        <div class="timers-grid">
-            <div class="timer-item" id="dailyTimer">
-                <div class="timer-icon"><i class="fas fa-gift"></i></div>
-                <div class="timer-label">Ежедневная награда</div>
-                <div class="timer-value">14:37</div>
-            </div>
-            
-            <div class="timer-item" id="cipherTimer">
-                <div class="timer-icon"><i class="fas fa-lock"></i></div>
-                <div class="timer-label">Ежедневный шифр</div>
-                <div class="timer-value">09:37</div>
-            </div>
-            
-            <div class="timer-item" id="comboTimer">
-                <div class="timer-icon"><i class="fas fa-fire"></i></div>
-                <div class="timer-label">Комбо</div>
-                <div class="timer-value">02:37</div>
-            </div>
-        </div>
-        
-        <!-- Кнопка клика -->
-        <div class="click-area" id="clickArea">
-            <div class="click-text">
-                <i class="fas fa-hand-pointer"></i><br>
-                НАЖМИ МЕНЯ!
-            </div>
-            <div class="click-count" id="clickCount">0 кликов</div>
-        </div>
-        
-        <!-- Кнопки действий -->
-        <div class="actions-grid">
-            <button class="action-btn daily" id="dailyBtn">
-                <i class="fas fa-gift"></i>
-                Ежедневная награда
-            </button>
-            
-            <button class="action-btn cipher" id="cipherBtn">
-                <i class="fas fa-lock"></i>
-                Ежедневный шифр
-            </button>
-            
-            <button class="action-btn boost" id="boostBtn">
-                <i class="fas fa-bolt"></i>
-                Boost
-                <div style="font-size: 0.9em; opacity: 0.9;">2500 MPTC</div>
-            </button>
-            
-            <button class="action-btn" id="friendsBtn">
-                <i class="fas fa-user-plus"></i>
-                Добавить друга
-            </button>
         </div>
         
         <!-- Статистика -->
-        <div class="balance-card">
-            <h3 style="margin-bottom: 15px; color: var(--primary);">
-                <i class="fas fa-chart-bar"></i> Статистика
-            </h3>
-            
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-label">Всего кликов</div>
-                    <div class="stat-value" id="totalClicks">0</div>
+        <div id="statsTab" class="tab-content" style="display: none;">
+            <div class="main-screen">
+                <h2 style="margin-bottom: 20px; color: var(--primary);"><i class="fas fa-chart-bar"></i> Статистика</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">Всего кликов</div>
+                        <div class="stat-value" id="statClicks">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Друзей</div>
+                        <div class="stat-value" id="statFriends">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Уровень</div>
+                        <div class="stat-value" id="statLevel">1</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Ранг</div>
+                        <div class="stat-value" id="statRank">Bronze I</div>
+                    </div>
                 </div>
                 
-                <div class="stat-item">
-                    <div class="stat-label">Друзей</div>
-                    <div class="stat-value" id="friendsCount">0</div>
+                <div style="margin-top: 25px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>Прогресс уровня</span>
+                        <span id="xpText">0/1000</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="xpProgress" style="width: 0%"></div>
+                    </div>
                 </div>
                 
-                <div class="stat-item">
-                    <div class="stat-label">Уровень</div>
-                    <div class="stat-value" id="playerLevel">1</div>
+                <div style="margin-top: 25px; padding: 15px; background: rgba(108, 99, 255, 0.1); border-radius: 15px;">
+                    <div style="font-weight: bold; margin-bottom: 10px; color: var(--primary);">🏆 Достижения</div>
+                    <div style="font-size: 0.9em; opacity: 0.9;">
+                        <div>• Первый клик ✔️</div>
+                        <div>• 100 кликов</div>
+                        <div>• Пригласить друга</div>
+                        <div>• Получить шифр</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Друзья -->
+        <div id="friendsTab" class="tab-content" style="display: none;">
+            <div class="main-screen">
+                <h2 style="margin-bottom: 20px; color: var(--primary);"><i class="fas fa-users"></i> Друзья</h2>
+                
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <div style="font-size: 2em; font-weight: bold; color: var(--accent);" id="totalFriends">0</div>
+                    <div style="opacity: 0.9;">Всего друзей</div>
                 </div>
                 
-                <div class="stat-item">
-                    <div class="stat-label">Ранг прогресс</div>
-                    <div class="stat-value" id="rankProgress">4/10</div>
+                <div style="background: rgba(108, 99, 255, 0.1); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                    <div style="font-weight: bold; margin-bottom: 15px; color: var(--primary);">🎁 Реферальная система</div>
+                    <div style="margin-bottom: 15px; font-size: 0.95em;">
+                        Приглашайте друзей и получайте бонусы:
+                    </div>
+                    <div style="margin-bottom: 10px;">• +500 MPTC за каждого друга</div>
+                    <div style="margin-bottom: 10px;">• +5% от дохода друзей</div>
+                    <div style="margin-bottom: 15px;">• Бонусы за активность друзей</div>
+                    
+                    <div class="form-group">
+                        <input type="text" class="form-input" id="referralLink" value="Загрузка..." readonly>
+                    </div>
+                    <button class="form-btn" onclick="copyReferralLink()" style="background: linear-gradient(135deg, var(--success), #00A855);">
+                        <i class="fas fa-copy"></i> Скопировать ссылку
+                    </button>
+                </div>
+                
+                <div id="friendsList" style="text-align: center; opacity: 0.8; padding: 20px;">
+                    Список друзей загружается...
                 </div>
             </div>
         </div>
@@ -573,113 +612,134 @@
     
     <!-- Навигация -->
     <div class="navigation">
-        <a href="#" class="nav-btn active">
+        <div class="nav-btn active" data-nav="main">
             <i class="fas fa-home"></i>
             Главная
-        </a>
-        <a href="#" class="nav-btn" id="exchangeBtn">
+        </div>
+        <div class="nav-btn" data-nav="exchange">
             <i class="fas fa-exchange-alt"></i>
-            Exchange
-        </a>
-        <a href="#" class="nav-btn" id="mineBtn">
+            Обмен
+        </div>
+        <div class="nav-btn" data-nav="mine">
             <i class="fas fa-gem"></i>
             Mine
-        </a>
-        <a href="#" class="nav-btn" id="earnBtn">
+        </div>
+        <div class="nav-btn" data-nav="earn">
             <i class="fas fa-coins"></i>
             Earn
-        </a>
-        <a href="#" class="nav-btn" id="airdropBtn">
+        </div>
+        <div class="nav-btn" data-nav="airdrop">
             <i class="fas fa-parachute-box"></i>
             Airdrop
-        </a>
+        </div>
     </div>
     
     <script>
         // Игровые данные
         let gameData = {
-            balance: 52089,
-            energy: 962,
-            energyMax: 1000,
-            rank: "Platinum",
-            rankProgress: 4,
-            rankMax: 10,
-            hourlyIncome: 15700,
+            balance: 0,
+            energy: 100,
+            energyMax: 100,
+            hourlyIncome: 10,
             totalClicks: 0,
-            friendsCount: 0,
+            friends: 0,
             level: 1,
+            experience: 0,
+            xpNeeded: 1000,
+            rank: "Bronze I",
+            rankNumber: 1,
+            lastDaily: null,
+            lastCipher: null,
+            lastCombo: null,
             boostActive: false,
             boostEnds: 0,
-            playerName: "MPThamst Player",
-            photoUrl: "https://i.ibb.co/xtnhzyvV/foto.jpg"
+            playerName: "Игрок"
         };
         
-        // Telegram Web App
-        let tg = window.Telegram?.WebApp;
+        // Состояние таймеров
+        let timers = {
+            daily: 24 * 3600,
+            cipher: 24 * 3600,
+            combo: 24 * 3600
+        };
         
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
-            // Устанавливаем фото
-            document.getElementById('profileImg').src = gameData.photoUrl;
-            
-            // Получаем имя из Telegram
-            if (tg && tg.initDataUnsafe?.user) {
-                const user = tg.initDataUnsafe.user;
-                gameData.playerName = user.first_name || "Player";
-                document.getElementById('playerName').textContent = gameData.playerName;
-            }
-            
             // Загружаем сохранения
             loadGame();
             
-            // Обновляем UI
-            updateUI();
+            // Настройка вкладок
+            setupTabs();
+            
+            // Настройка навигации
+            setupNavigation();
             
             // Настройка клика
             const clickArea = document.getElementById('clickArea');
             clickArea.addEventListener('click', handleClick);
             clickArea.addEventListener('touchstart', handleClick);
             
-            // Кнопки
-            document.getElementById('dailyBtn').addEventListener('click', claimDaily);
-            document.getElementById('cipherBtn').addEventListener('click', claimCipher);
-            document.getElementById('boostBtn').addEventListener('click', buyBoost);
-            document.getElementById('friendsBtn').addEventListener('click', addFriend);
-            
-            // Навигация
-            document.getElementById('exchangeBtn').addEventListener('click', () => showNotification("Exchange section coming soon!", "info"));
-            document.getElementById('mineBtn').addEventListener('click', () => showNotification("Mine section coming soon!", "info"));
-            document.getElementById('earnBtn').addEventListener('click', () => showNotification("Earn section coming soon!", "info"));
-            document.getElementById('airdropBtn').addEventListener('click', () => showNotification("Airdrop section coming soon!", "info"));
-            
-            // Обновляем таймеры
+            // Запуск таймеров
             updateTimers();
             setInterval(updateTimers, 1000);
             
             // Восстановление энергии
-            setInterval(restoreEnergy, 3000);
+            setInterval(restoreEnergy, 60000); // 1 энергия в минуту
             
-            // Расширяем на весь экран в Telegram
-            if (tg) {
-                tg.expand();
-                tg.BackButton.hide();
-            }
+            // Автосохранение
+            setInterval(saveGame, 30000);
+            
+            // Обновление UI
+            updateUI();
+            
+            // Загружаем имя игрока
+            loadPlayerName();
         });
         
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Убираем активный класс у всех вкладок
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Добавляем активный класс текущей вкладке
+                    this.classList.add('active');
+                    
+                    // Скрываем все контенты
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.style.display = 'none';
+                    });
+                    
+                    // Показываем выбранный контент
+                    document.getElementById(tabId + 'Tab').style.display = 'block';
+                });
+            });
+        }
+        
+        function setupNavigation() {
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const navId = this.getAttribute('data-nav');
+                    
+                    // Показываем уведомление для неготовых разделов
+                    if (navId !== 'main') {
+                        showNotification("Раздел в разработке!", "warning");
+                    }
+                });
+            });
+        }
+        
         function handleClick(event) {
-            // Проверка энергии
             if (gameData.energy <= 0) {
                 showNotification("❌ Недостаточно энергии!", "error");
                 return;
             }
             
-            // Позиция клика
-            const rect = event.target.getBoundingClientRect();
-            const x = event.clientX || event.touches[0].clientX;
-            const y = event.clientY || event.touches[0].clientY;
-            
-            // Создаем эффект
-            createFloatingText(x - rect.left, y - rect.top);
+            // Эффект клика
+            createClickEffect(event);
             
             // Обновляем игру
             gameData.energy--;
@@ -691,65 +751,119 @@
             reward = Math.max(1, reward);
             
             gameData.balance += reward;
+            gameData.experience += Math.floor(reward / 2);
             
-            // Проверка ранга
-            checkRankUp();
+            // Проверка уровня
+            checkLevelUp();
             
             // Обновляем UI
             updateUI();
             
-            // Сохраняем игру
-            saveGame();
+            // Показываем награду
+            showClickReward(reward, event);
             
             // Вибрация
             if (navigator.vibrate) {
-                navigator.vibrate(50);
-            }
-            
-            // Отправляем в Telegram (если есть)
-            if (tg) {
-                tg.HapticFeedback.impactOccurred('light');
+                navigator.vibrate(20);
             }
         }
         
-        function createFloatingText(x, y) {
-            const reward = Math.floor(gameData.hourlyIncome / 60);
-            const text = document.createElement('div');
-            text.className = 'floating-text';
-            text.textContent = `+${reward}`;
-            text.style.left = x + 'px';
-            text.style.top = y + 'px';
+        function createClickEffect(event) {
+            const clickArea = document.getElementById('clickArea');
+            const rect = clickArea.getBoundingClientRect();
+            const x = event.clientX || event.touches[0].clientX;
+            const y = event.clientY || event.touches[0].clientY;
             
-            document.getElementById('clickArea').appendChild(text);
+            const effect = document.createElement('div');
+            effect.style.position = 'absolute';
+            effect.style.width = '100px';
+            effect.style.height = '100px';
+            effect.style.background = 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)';
+            effect.style.borderRadius = '50%';
+            effect.style.pointerEvents = 'none';
+            effect.style.left = (x - rect.left - 50) + 'px';
+            effect.style.top = (y - rect.top - 50) + 'px';
+            effect.style.animation = 'clickEffect 0.6s ease-out forwards';
+            
+            clickArea.appendChild(effect);
+            
+            setTimeout(() => effect.remove(), 600);
+        }
+        
+        function showClickReward(reward, event) {
+            const clickArea = document.getElementById('clickArea');
+            const rect = clickArea.getBoundingClientRect();
+            const x = event.clientX || event.touches[0].clientX;
+            const y = event.clientY || event.touches[0].clientY;
+            
+            const text = document.createElement('div');
+            text.textContent = `+${reward}`;
+            text.style.position = 'absolute';
+            text.style.left = (x - rect.left) + 'px';
+            text.style.top = (y - rect.top) + 'px';
+            text.style.color = '#00FF88';
+            text.style.fontWeight = 'bold';
+            text.style.fontSize = '1.2em';
+            text.style.pointerEvents = 'none';
+            text.style.animation = 'floatUp 1s ease-out forwards';
+            
+            clickArea.appendChild(text);
             
             setTimeout(() => text.remove(), 1000);
         }
         
         function claimDaily() {
-            const reward = 2500;
-            gameData.balance += reward;
-            
-            showNotification(`🎁 Ежедневная награда получена!\n+${reward} MPTC`, "success");
-            
-            updateUI();
-            saveGame();
-        }
-        
-        function claimCipher() {
-            // Генерация шифра
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let cipher = '';
-            for (let i = 0; i < 8; i++) {
-                cipher += chars.charAt(Math.floor(Math.random() * chars.length));
+            if (timers.daily > 0) {
+                const hours = Math.floor(timers.daily / 3600);
+                const minutes = Math.floor((timers.daily % 3600) / 60);
+                showNotification(`⏳ Ежедневная награда доступна через ${hours}ч ${minutes}м`, "warning");
+                return;
             }
             
-            const reward = Math.floor(Math.random() * 1500) + 500;
+            const reward = Math.floor(Math.random() * 4000) + 1000; // 1000-5000
             gameData.balance += reward;
+            gameData.lastDaily = Date.now();
             
-            showNotification(`🔐 Ежедневный шифр: ${cipher}\n🎯 Награда: +${reward} MPTC`, "success");
+            // Сброс таймера на 24 часа
+            timers.daily = 24 * 3600;
             
+            showNotification(`🎁 Ежедневная награда: +${reward} MPTC!`, "success");
             updateUI();
-            saveGame();
+        }
+        
+        function showCipherModal() {
+            if (timers.cipher > 0) {
+                const hours = Math.floor(timers.cipher / 3600);
+                const minutes = Math.floor((timers.cipher % 3600) / 60);
+                showNotification(`⏳ Шифр доступен через ${hours}ч ${minutes}м`, "warning");
+                return;
+            }
+            
+            // Показываем модальное окно с шифром
+            document.getElementById('cipherContent').innerHTML = `
+                <p style="margin-bottom: 15px; opacity: 0.9;">Получите шифр у бота в Telegram:</p>
+                <div style="text-align: center; margin: 20px 0;">
+                    <div style="background: rgba(108, 99, 255, 0.2); padding: 20px; border-radius: 12px; font-family: monospace; font-size: 1.5em; letter-spacing: 2px; margin-bottom: 15px;">
+                        <span id="cipherCode">---</span>
+                    </div>
+                    <p style="font-size: 0.9em; opacity: 0.8; margin-bottom: 20px;">Используйте команду /cipher КОД в боте</p>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button class="form-btn" onclick="getCipherFromBot()" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                        <i class="fas fa-robot"></i> Получить шифр
+                    </button>
+                    <button class="form-btn" onclick="closeModal('cipherModal')">
+                        Закрыть
+                    </button>
+                </div>
+            `;
+            
+            openModal('cipherModal');
+        }
+        
+        function getCipherFromBot() {
+            showNotification("Откройте бота для получения шифра", "info");
+            closeModal('cipherModal');
         }
         
         function buyBoost() {
@@ -758,73 +872,88 @@
                 return;
             }
             
+            if (gameData.boostActive) {
+                const remaining = Math.floor((gameData.boostEnds - Date.now()) / 60000);
+                showNotification(`⏳ Буст уже активен! Осталось: ${remaining} минут`, "warning");
+                return;
+            }
+            
             gameData.balance -= 2500;
             gameData.boostActive = true;
             gameData.boostEnds = Date.now() + 3600000; // 1 час
             
-            // Показываем индикатор
-            document.getElementById('boostIndicator').style.display = 'block';
+            showNotification(`⚡ Буст активирован! Доход x2 на 60 минут!`, "success");
+            updateUI();
             
-            // Увеличиваем доход
-            const oldIncome = gameData.hourlyIncome;
-            gameData.hourlyIncome = oldIncome * 2;
-            
-            showNotification(`⚡ Буст активирован!\nДоход x2 на 60 минут`, "success");
-            
-            // Автоматически выключаем через час
+            // Автоматическое отключение буста
             setTimeout(() => {
                 gameData.boostActive = false;
-                gameData.hourlyIncome = oldIncome;
-                document.getElementById('boostIndicator').style.display = 'none';
                 showNotification("🔚 Буст завершен", "info");
                 updateUI();
             }, 3600000);
-            
-            updateUI();
-            saveGame();
+        }
+        
+        function showFriendModal() {
+            openModal('friendModal');
         }
         
         function addFriend() {
-            const reward = 500;
-            gameData.balance += reward;
-            gameData.friendsCount++;
+            const username = document.getElementById('friendUsername').value.trim();
             
-            showNotification(`👥 Друг добавлен!\n+${reward} MPTC\nВсего друзей: ${gameData.friendsCount}`, "success");
+            if (!username) {
+                showNotification("❌ Введите username друга", "error");
+                return;
+            }
             
+            // Имитация добавления друга
+            gameData.friends++;
+            gameData.balance += 500;
+            
+            showNotification(`👥 Друг @${username} добавлен! +500 MPTC`, "success");
+            closeModal('friendModal');
+            document.getElementById('friendUsername').value = '';
             updateUI();
-            saveGame();
         }
         
-        function checkRankUp() {
-            // Случайное увеличение прогресса
-            if (Math.random() < 0.15) {
-                if (gameData.rankProgress < gameData.rankMax) {
-                    gameData.rankProgress++;
-                    
-                    // Проверяем повышение ранга
-                    if (gameData.rankProgress >= gameData.rankMax) {
-                        const ranks = ["Bronze", "Silver", "Gold", "Platinum", "Diamond"];
-                        const currentIndex = ranks.indexOf(gameData.rank);
-                        
-                        if (currentIndex < ranks.length - 1) {
-                            gameData.rank = ranks[currentIndex + 1];
-                            gameData.rankProgress = 1;
-                            
-                            // Увеличиваем доход
-                            const incomeMap = {
-                                "Bronze": 93,
-                                "Silver": 250,
-                                "Gold": 600,
-                                "Platinum": 15700,
-                                "Diamond": 50000
-                            };
-                            
-                            gameData.hourlyIncome = incomeMap[gameData.rank];
-                            
-                            showNotification(`🏆 Поздравляем! Новый ранг: ${gameData.rank}!`, "success");
-                        }
-                    }
+        function copyReferralLink() {
+            const link = `https://t.me/MPThamstBot?start=ref_${Date.now()}`;
+            navigator.clipboard.writeText(link).then(() => {
+                showNotification("✅ Ссылка скопирована в буфер!", "success");
+            });
+        }
+        
+        function checkLevelUp() {
+            if (gameData.experience >= gameData.xpNeeded) {
+                gameData.level++;
+                gameData.experience -= gameData.xpNeeded;
+                gameData.xpNeeded = gameData.level * 1000;
+                gameData.hourlyIncome += gameData.level * 5;
+                
+                // Повышение ранга каждые 5 уровней
+                if (gameData.level % 5 === 0) {
+                    gameData.rankNumber++;
+                    updateRank();
                 }
+                
+                showNotification(`🎉 Уровень повышен! Теперь уровень ${gameData.level}`, "success");
+            }
+        }
+        
+        function updateRank() {
+            const ranks = [
+                "Bronze I", "Bronze II", "Bronze III",
+                "Silver I", "Silver II", "Silver III",
+                "Gold I", "Gold II", "Gold III",
+                "Platinum I", "Platinum II", "Platinum III",
+                "Diamond I", "Diamond II", "Diamond III",
+                "Master I", "Master II", "Master III",
+                "Grandmaster", "Legend"
+            ];
+            
+            if (gameData.rankNumber < ranks.length) {
+                gameData.rank = ranks[gameData.rankNumber - 1];
+            } else {
+                gameData.rank = "Legend";
             }
         }
         
@@ -835,110 +964,134 @@
             }
         }
         
+        function updateTimers() {
+            // Уменьшаем таймеры
+            if (timers.daily > 0) timers.daily--;
+            if (timers.cipher > 0) timers.cipher--;
+            if (timers.combo > 0) timers.combo--;
+            
+            // Обновляем отображение
+            document.getElementById('dailyTimer').textContent = formatTime(timers.daily);
+            document.getElementById('cipherTimer').textContent = formatTime(timers.cipher);
+            document.getElementById('comboTimer').textContent = formatTime(timers.combo);
+        }
+        
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        }
+        
         function updateUI() {
-            // Баланс
-            document.getElementById('balance').textContent = 
-                gameData.balance.toLocaleString();
+            // Основная информация
+            document.getElementById('balance').textContent = gameData.balance.toLocaleString();
+            document.getElementById('hourlyIncome').textContent = `+${gameData.hourlyIncome.toLocaleString()}`;
             
             // Энергия
             const energyPercent = (gameData.energy / gameData.energyMax) * 100;
             document.getElementById('energyFill').style.width = energyPercent + '%';
-            document.getElementById('energyText').textContent = 
-                `${gameData.energy} / ${gameData.energyMax}`;
+            document.getElementById('energyText').textContent = `${gameData.energy} / ${gameData.energyMax}`;
             
-            // Ранг
-            document.getElementById('rankText').textContent = 
-                `${gameData.rank} > ${gameData.rankProgress}/${gameData.rankMax}`;
-            
-            // Доход
-            document.getElementById('hourlyIncome').textContent = 
-                `+${gameData.hourlyIncome.toLocaleString()}`;
+            // Клики
+            document.getElementById('clickCount').textContent = `${gameData.totalClicks.toLocaleString()} кликов`;
             
             // Статистика
-            document.getElementById('totalClicks').textContent = gameData.totalClicks.toLocaleString();
-            document.getElementById('friendsCount').textContent = gameData.friendsCount;
-            document.getElementById('playerLevel').textContent = gameData.level;
-            document.getElementById('clickCount').textContent = `${gameData.totalClicks} кликов`;
-            document.getElementById('rankProgress').textContent = `${gameData.rankProgress}/${gameData.rankMax}`;
+            document.getElementById('statClicks').textContent = gameData.totalClicks.toLocaleString();
+            document.getElementById('statFriends').textContent = gameData.friends;
+            document.getElementById('statLevel').textContent = gameData.level;
+            document.getElementById('statRank').textContent = gameData.rank;
             
-            // Обновляем цвет ранга
-            updateRankBadge();
-        }
-        
-        function updateRankBadge() {
-            const badge = document.getElementById('rankBadge');
+            // XP
+            const xpPercent = (gameData.experience / gameData.xpNeeded) * 100;
+            document.getElementById('xpProgress').style.width = Math.min(xpPercent, 100) + '%';
+            document.getElementById('xpText').textContent = `${gameData.experience.toLocaleString()}/${gameData.xpNeeded.toLocaleString()}`;
             
-            // Удаляем старые классы
-            badge.className = 'rank-badge';
-            badge.classList.add(gameData.rank.toLowerCase());
+            // Друзья
+            document.getElementById('totalFriends').textContent = gameData.friends;
             
-            // Цвета для рангов
-            const rankColors = {
-                "bronze": ["#CD7F32", "#8B4513"],
-                "silver": ["#C0C0C0", "#A0A0A0"],
-                "gold": ["#FFD700", "#FFA500"],
-                "platinum": ["#E5E4E2", "#C0C0C0"],
-                "diamond": ["#B9F2FF", "#87CEEB"]
-            };
-            
-            const colors = rankColors[gameData.rank.toLowerCase()] || ["#6C63FF", "#4A44C6"];
-            badge.style.background = `linear-gradient(135deg, ${colors[0]}, ${colors[1]})`;
-        }
-        
-        function updateTimers() {
-            const now = new Date();
-            
-            // Ежедневная награда 14:37
-            const dailyTime = new Date();
-            dailyTime.setHours(14, 37, 0, 0);
-            if (now > dailyTime) dailyTime.setDate(dailyTime.getDate() + 1);
-            
-            // Ежедневный шифр 09:37
-            const cipherTime = new Date();
-            cipherTime.setHours(9, 37, 0, 0);
-            if (now > cipherTime) cipherTime.setDate(cipherTime.getDate() + 1);
-            
-            // Комбо 02:37
-            const comboTime = new Date();
-            comboTime.setHours(2, 37, 0, 0);
-            if (now > comboTime) comboTime.setDate(comboTime.getDate() + 1);
-            
-            // Обновляем таймеры
-            document.querySelector('#dailyTimer .timer-value').textContent = 
-                formatTime(dailyTime - now);
-            document.querySelector('#cipherTimer .timer-value').textContent = 
-                formatTime(cipherTime - now);
-            document.querySelector('#comboTimer .timer-value').textContent = 
-                formatTime(comboTime - now);
-        }
-        
-        function formatTime(ms) {
-            const hours = Math.floor(ms / (1000 * 60 * 60));
-            const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-        }
-        
-        function showNotification(message, type) {
-            // Можно добавить уведомления
-            console.log(`[${type.toUpperCase()}] ${message}`);
-            
-            // Просто показываем alert для примера
-            if (type === 'error' || type === 'success') {
-                alert(message);
+            // Индикатор буста
+            if (gameData.boostActive) {
+                document.querySelector('#clickArea').style.background = 'linear-gradient(135deg, #FFD700, #FFA500)';
+            } else {
+                document.querySelector('#clickArea').style.background = 'linear-gradient(135deg, var(--primary), var(--secondary))';
             }
         }
         
+        function loadPlayerName() {
+            // Можно получить имя из Telegram Web App или оставить по умолчанию
+            const urlParams = new URLSearchParams(window.location.search);
+            const name = urlParams.get('name') || "MPThamst Player";
+            gameData.playerName = name;
+            document.getElementById('playerName').textContent = name;
+        }
+        
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        function showNotification(message, type = "info") {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
         function saveGame() {
-            localStorage.setItem('mpthamst_save', JSON.stringify(gameData));
+            const saveData = {
+                ...gameData,
+                saveTime: Date.now()
+            };
+            localStorage.setItem('mpthamst_save', JSON.stringify(saveData));
         }
         
         function loadGame() {
             const saved = localStorage.getItem('mpthamst_save');
             if (saved) {
-                const loaded = JSON.parse(saved);
-                Object.assign(gameData, loaded);
+                try {
+                    const loaded = JSON.parse(saved);
+                    Object.assign(gameData, loaded);
+                    
+                    // Проверяем буст
+                    if (gameData.boostActive && Date.now() > gameData.boostEnds) {
+                        gameData.boostActive = false;
+                    }
+                } catch (e) {
+                    console.log("Ошибка загрузки сохранения:", e);
+                }
             }
         }
+        
+        // Добавляем CSS анимации
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes clickEffect {
+                0% { transform: scale(0.5); opacity: 1; }
+                100% { transform: scale(1.5); opacity: 0; }
+            }
+            
+            @keyframes floatUp {
+                0% { transform: translateY(0) scale(1); opacity: 1; }
+                100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+            }
+            
+            .tab-content {
+                animation: fadeIn 0.3s ease-out;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
