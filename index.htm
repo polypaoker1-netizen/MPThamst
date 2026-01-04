@@ -39,6 +39,35 @@
             padding-bottom: 80px;
         }
         
+        /* Загрузчик */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(108, 99, 255, 0.3);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
         /* Вкладки */
         .tabs {
             display: flex;
@@ -160,6 +189,10 @@
             box-shadow: 0 15px 35px rgba(108, 99, 255, 0.4);
         }
         
+        .click-area.boost {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+        }
+        
         .click-area:active {
             transform: scale(0.97);
         }
@@ -230,6 +263,14 @@
             font-size: 1.6em;
         }
         
+        .action-btn.boost {
+            background: linear-gradient(135deg, var(--accent), #FF3366);
+        }
+        
+        .action-btn.success {
+            background: linear-gradient(135deg, var(--success), #00A855);
+        }
+        
         /* Модальные окна */
         .modal {
             display: none;
@@ -253,6 +294,8 @@
             width: 100%;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            max-height: 80vh;
+            overflow-y: auto;
         }
         
         .modal-header {
@@ -277,58 +320,103 @@
             padding: 5px;
         }
         
-        .form-group {
-            margin-bottom: 15px;
+        /* Магазин */
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0;
         }
         
-        .form-input {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            color: white;
-            font-size: 1em;
+        .shop-item {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
         }
         
-        .form-btn {
+        .shop-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-3px);
+        }
+        
+        .shop-item-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+        
+        .shop-item-price {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--accent);
+            margin: 8px 0;
+        }
+        
+        .shop-item-btn {
             width: 100%;
-            padding: 14px;
+            padding: 10px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
             border-radius: 10px;
             color: white;
             font-weight: bold;
-            font-size: 1em;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 5px;
         }
         
-        /* Статистика */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .stat-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
+        /* Прокачка */
+        .upgrade-item {
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 15px;
-            text-align: center;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
         
-        .stat-value {
-            font-size: 1.6em;
+        .upgrade-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+        
+        .upgrade-info {
+            flex: 1;
+        }
+        
+        .upgrade-name {
             font-weight: bold;
-            margin: 8px 0;
-            color: var(--accent);
+            margin-bottom: 5px;
         }
         
-        .stat-label {
-            font-size: 0.85em;
-            opacity: 0.9;
+        .upgrade-desc {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .upgrade-btn {
+            padding: 8px 15px;
+            background: linear-gradient(135deg, var(--success), #00A855);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .upgrade-btn.disabled {
+            background: rgba(255, 255, 255, 0.2);
+            cursor: not-allowed;
         }
         
         /* Прогресс бар */
@@ -360,6 +448,8 @@
             z-index: 1001;
             display: none;
             animation: slideDown 0.3s ease-out;
+            text-align: center;
+            max-width: 90%;
         }
         
         .notification.error {
@@ -415,6 +505,12 @@
     </style>
 </head>
 <body>
+    <!-- Загрузчик -->
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <div>Загрузка игры...</div>
+    </div>
+    
     <!-- Уведомления -->
     <div class="notification" id="notification"></div>
     
@@ -431,28 +527,8 @@
         </div>
     </div>
     
-    <!-- Модальное окно добавления друга -->
-    <div class="modal" id="friendModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">👥 Добавить друга</div>
-                <button class="close-btn" onclick="closeModal('friendModal')">&times;</button>
-            </div>
-            <p style="margin-bottom: 15px; opacity: 0.9;">Введите username друга (без @)</p>
-            <div class="form-group">
-                <input type="text" class="form-input" id="friendUsername" placeholder="username">
-            </div>
-            <button class="form-btn" onclick="addFriend()">Добавить друга</button>
-            <div style="margin-top: 20px; padding: 15px; background: rgba(108, 99, 255, 0.1); border-radius: 10px;">
-                <div style="font-weight: bold; margin-bottom: 10px; color: var(--primary);">🎁 Награды за друзей:</div>
-                <div>• +500 MPTC за каждого приглашенного</div>
-                <div>• Друг получает +200 MPTC</div>
-            </div>
-        </div>
-    </div>
-    
     <!-- Основной контейнер -->
-    <div class="container">
+    <div class="container" id="mainContainer" style="display: none;">
         <!-- Вкладки -->
         <div class="tabs" id="tabs">
             <div class="tab active" data-tab="main">Главная</div>
@@ -495,7 +571,7 @@
                     </div>
                     <div class="timer-item">
                         <div class="timer-label">Комбо</div>
-                        <div class="timer-value" id="comboTimer">24:00</div>
+                        <div class="timer-value" id="comboTimer">06:00</div>
                     </div>
                 </div>
                 
@@ -509,7 +585,7 @@
                 
                 <!-- Кнопки действий -->
                 <div class="actions">
-                    <button class="action-btn" onclick="claimDaily()">
+                    <button class="action-btn success" onclick="claimDaily()">
                         <i class="fas fa-gift"></i>
                         Ежедневная награда
                     </button>
@@ -517,14 +593,13 @@
                         <i class="fas fa-lock"></i>
                         Ежедневный шифр
                     </button>
-                    <button class="action-btn" onclick="buyBoost()" style="background: linear-gradient(135deg, var(--accent), #FF3366);">
+                    <button class="action-btn boost" onclick="showShopModal()">
                         <i class="fas fa-bolt"></i>
-                        Boost
-                        <div style="font-size: 0.9em;">2500 MPTC</div>
+                        Купить буст
                     </button>
-                    <button class="action-btn" onclick="showFriendModal()">
+                    <button class="action-btn" onclick="showFriendsModal()">
                         <i class="fas fa-user-plus"></i>
-                        Добавить друга
+                        Мои рефералы
                     </button>
                 </div>
             </div>
@@ -535,42 +610,41 @@
             <div class="main-screen">
                 <h2 style="margin-bottom: 20px; color: var(--primary);"><i class="fas fa-chart-bar"></i> Статистика</h2>
                 
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-label">Всего кликов</div>
-                        <div class="stat-value" id="statClicks">0</div>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 2em; font-weight: bold; color: var(--accent);" id="statBalance">0</div>
+                    <div style="opacity: 0.9;">Баланс</div>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 15px; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>Всего кликов</span>
+                        <span style="font-weight: bold;" id="statClicks">0</span>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Друзей</div>
-                        <div class="stat-value" id="statFriends">0</div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>Рефералов</span>
+                        <span style="font-weight: bold;" id="statFriends">0</span>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Уровень</div>
-                        <div class="stat-value" id="statLevel">1</div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>Уровень</span>
+                        <span style="font-weight: bold;" id="statLevel">1</span>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Ранг</div>
-                        <div class="stat-value" id="statRank">Bronze I</div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>Ранг</span>
+                        <span style="font-weight: bold;" id="statRank">Bronze I</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Доход/час</span>
+                        <span style="font-weight: bold; color: var(--success);" id="statIncome">+0</span>
                     </div>
                 </div>
                 
-                <div style="margin-top: 25px;">
+                <div style="margin-top: 20px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                         <span>Прогресс уровня</span>
-                        <span id="xpText">0/1000</span>
+                        <span id="xpText">0/0</span>
                     </div>
                     <div class="progress-bar">
                         <div class="progress-fill" id="xpProgress" style="width: 0%"></div>
-                    </div>
-                </div>
-                
-                <div style="margin-top: 25px; padding: 15px; background: rgba(108, 99, 255, 0.1); border-radius: 15px;">
-                    <div style="font-weight: bold; margin-bottom: 10px; color: var(--primary);">🏆 Достижения</div>
-                    <div style="font-size: 0.9em; opacity: 0.9;">
-                        <div>• Первый клик ✔️</div>
-                        <div>• 100 кликов</div>
-                        <div>• Пригласить друга</div>
-                        <div>• Получить шифр</div>
                     </div>
                 </div>
             </div>
@@ -579,11 +653,11 @@
         <!-- Друзья -->
         <div id="friendsTab" class="tab-content" style="display: none;">
             <div class="main-screen">
-                <h2 style="margin-bottom: 20px; color: var(--primary);"><i class="fas fa-users"></i> Друзья</h2>
+                <h2 style="margin-bottom: 20px; color: var(--primary);"><i class="fas fa-users"></i> Мои рефералы</h2>
                 
                 <div style="text-align: center; margin-bottom: 25px;">
                     <div style="font-size: 2em; font-weight: bold; color: var(--accent);" id="totalFriends">0</div>
-                    <div style="opacity: 0.9;">Всего друзей</div>
+                    <div style="opacity: 0.9;">Всего рефералов</div>
                 </div>
                 
                 <div style="background: rgba(108, 99, 255, 0.1); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
@@ -591,27 +665,131 @@
                     <div style="margin-bottom: 15px; font-size: 0.95em;">
                         Приглашайте друзей и получайте бонусы:
                     </div>
-                    <div style="margin-bottom: 10px;">• +500 MPTC за каждого друга</div>
-                    <div style="margin-bottom: 10px;">• +5% от дохода друзей</div>
-                    <div style="margin-bottom: 15px;">• Бонусы за активность друзей</div>
+                    <div style="margin-bottom: 10px;">• +200 MPTC новичку при регистрации</div>
+                    <div style="margin-bottom: 10px;">• +500 MPTC вам, когда друг сделает 100 кликов</div>
+                    <div style="margin-bottom: 15px;">• +1 к количеству рефералов</div>
                     
-                    <div class="form-group">
-                        <input type="text" class="form-input" id="referralLink" value="Загрузка..." readonly>
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-weight: bold; margin-bottom: 8px; color: var(--success);">Ваша реферальная ссылка:</div>
+                        <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; font-family: monospace; font-size: 0.9em; word-break: break-all;"
+                             id="referralLink">
+                            Загрузка...
+                        </div>
                     </div>
-                    <button class="form-btn" onclick="copyReferralLink()" style="background: linear-gradient(135deg, var(--success), #00A855);">
+                    <button class="action-btn success" onclick="copyReferralLink()" style="width: 100%;">
                         <i class="fas fa-copy"></i> Скопировать ссылку
                     </button>
                 </div>
                 
                 <div id="friendsList" style="text-align: center; opacity: 0.8; padding: 20px;">
-                    Список друзей загружается...
+                    Загрузка списка рефералов...
+                </div>
+            </div>
+        </div>
+        
+        <!-- Магазин -->
+        <div id="shopTab" class="tab-content" style="display: none;">
+            <div class="main-screen">
+                <h2 style="margin-bottom: 20px; color: var(--primary);"><i class="fas fa-shopping-cart"></i> Магазин</h2>
+                
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <div style="font-size: 2em; font-weight: bold; color: var(--accent);" id="shopBalance">0</div>
+                    <div style="opacity: 0.9;">Ваш баланс</div>
+                </div>
+                
+                <div class="shop-items" id="shopItems">
+                    <!-- Товары загружаются динамически -->
+                </div>
+                
+                <div style="margin-top: 25px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 15px;">
+                    <div style="font-weight: bold; margin-bottom: 10px; color: var(--primary);">💡 Как покупать:</div>
+                    <div style="font-size: 0.9em; opacity: 0.9;">
+                        1. Нажмите на товар<br>
+                        2. Подтвердите покупку<br>
+                        3. Товар сразу применяется<br>
+                        4. Деньги списываются с баланса
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Прокачка -->
+        <div id="upgradesTab" class="tab-content" style="display: none;">
+            <div class="main-screen">
+                <h2 style="margin-bottom: 20px; color: var(--primary);"><i class="fas fa-level-up-alt"></i> Прокачка</h2>
+                
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <div style="font-size: 1.8em; font-weight: bold; color: var(--accent);" id="currentRank">Bronze I</div>
+                    <div style="opacity: 0.9;">Текущий ранг</div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>Уровень</span>
+                        <span style="font-weight: bold;" id="currentLevel">1</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="levelProgress" style="width: 0%"></div>
+                    </div>
+                    <div style="text-align: center; margin-top: 5px; font-size: 0.9em; opacity: 0.8;">
+                        <span id="levelXP">0/500 XP</span>
+                    </div>
+                </div>
+                
+                <div class="upgrade-item">
+                    <div class="upgrade-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="upgrade-info">
+                        <div class="upgrade-name">Увеличение дохода</div>
+                        <div class="upgrade-desc">+10 к доходу за уровень</div>
+                        <div style="font-size: 0.9em; color: var(--success);">
+                            Текущий доход: <span id="currentIncome">+10</span>/час
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="upgrade-item">
+                    <div class="upgrade-icon">
+                        <i class="fas fa-battery-full"></i>
+                    </div>
+                    <div class="upgrade-info">
+                        <div class="upgrade-name">Максимальная энергия</div>
+                        <div class="upgrade-desc">+20 энергии за каждый 5 уровень</div>
+                        <div style="font-size: 0.9em; color: var(--success);">
+                            Текущая энергия: <span id="currentEnergyMax">100</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="upgrade-item">
+                    <div class="upgrade-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="upgrade-info">
+                        <div class="upgrade-name">Повышение ранга</div>
+                        <div class="upgrade-desc">Каждые 5 уровней - новый ранг</div>
+                        <div style="font-size: 0.9em; color: var(--success);">
+                            Следующий ранг через: <span id="levelsToRank">4</span> уровней
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 25px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 15px;">
+                    <div style="font-weight: bold; margin-bottom: 10px; color: var(--primary);">📈 Как прокачиваться:</div>
+                    <div style="font-size: 0.9em; opacity: 0.9;">
+                        1. Кликайте и зарабатывайте XP<br>
+                        2. Повышайте уровень<br>
+                        3. Каждые 5 уровней получайте новый ранг<br>
+                        4. Новый ранг = больше дохода
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
     <!-- Навигация -->
-    <div class="navigation">
+    <div class="navigation" id="navigation" style="display: none;">
         <div class="nav-btn active" data-nav="main">
             <i class="fas fa-home"></i>
             Главная
@@ -637,36 +815,25 @@
     <script>
         // Игровые данные
         let gameData = {
-            balance: 0,
-            energy: 100,
-            energyMax: 100,
-            hourlyIncome: 10,
-            totalClicks: 0,
-            friends: 0,
-            level: 1,
-            experience: 0,
-            xpNeeded: 1000,
-            rank: "Bronze I",
-            rankNumber: 1,
-            lastDaily: null,
-            lastCipher: null,
-            lastCombo: null,
-            boostActive: false,
-            boostEnds: 0,
-            playerName: "Игрок"
+            player: null,
+            friends: [],
+            shopItems: {},
+            timers: {
+                daily: 86400,
+                cipher: 86400,
+                combo: 21600
+            },
+            referralLink: ""
         };
         
-        // Состояние таймеров
-        let timers = {
-            daily: 24 * 3600,
-            cipher: 24 * 3600,
-            combo: 24 * 3600
-        };
+        // Текущее состояние
+        let currentTab = 'main';
+        let isLoading = true;
         
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
-            // Загружаем сохранения
-            loadGame();
+            // Загружаем данные с сервера
+            loadGameData();
             
             // Настройка вкладок
             setupTabs();
@@ -683,24 +850,77 @@
             updateTimers();
             setInterval(updateTimers, 1000);
             
-            // Восстановление энергии
-            setInterval(restoreEnergy, 60000); // 1 энергия в минуту
-            
             // Автосохранение
-            setInterval(saveGame, 30000);
-            
-            // Обновление UI
-            updateUI();
-            
-            // Загружаем имя игрока
-            loadPlayerName();
+            setInterval(saveLocalData, 30000);
         });
+        
+        async function loadGameData() {
+            try {
+                // Имитация загрузки данных с сервера
+                // В реальности здесь будет запрос к API бота
+                
+                // Загружаем из localStorage
+                const saved = localStorage.getItem('mpthamst_game');
+                if (saved) {
+                    const loaded = JSON.parse(saved);
+                    gameData = {...gameData, ...loaded};
+                }
+                
+                // Имитируем успешную загрузку
+                setTimeout(() => {
+                    gameData.player = {
+                        username: "Игрок",
+                        balance: 0,
+                        energy: 100,
+                        energy_max: 100,
+                        rank: "Bronze I",
+                        rank_number: 1,
+                        hourly_income: 10,
+                        total_clicks: 0,
+                        friends_count: 0,
+                        level: 1,
+                        experience: 0,
+                        xp_needed: 500,
+                        boost_active: false
+                    };
+                    
+                    gameData.shopItems = {
+                        boost_1h: {name: "Буст 1 час", price: 2500, type: "boost", duration: 3600},
+                        boost_3h: {name: "Буст 3 часа", price: 6000, type: "boost", duration: 10800},
+                        energy_50: {name: "+50 энергии", price: 1000, type: "energy", amount: 50},
+                        energy_100: {name: "+100 энергии", price: 1800, type: "energy", amount: 100}
+                    };
+                    
+                    gameData.referralLink = "https://t.me/MPThamstBot?start=ref_" + Date.now();
+                    
+                    // Скрываем загрузчик
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('mainContainer').style.display = 'block';
+                    document.getElementById('navigation').style.display = 'flex';
+                    
+                    isLoading = false;
+                    
+                    // Обновляем UI
+                    updateUI();
+                    updateShopItems();
+                    
+                    showNotification("🎮 Добро пожаловать в MPThamst!", "success");
+                }, 1500);
+                
+            } catch (error) {
+                console.error("Ошибка загрузки:", error);
+                showNotification("❌ Ошибка загрузки игры", "error");
+            }
+        }
         
         function setupTabs() {
             const tabs = document.querySelectorAll('.tab');
             tabs.forEach(tab => {
                 tab.addEventListener('click', function() {
+                    if (isLoading) return;
+                    
                     const tabId = this.getAttribute('data-tab');
+                    currentTab = tabId;
                     
                     // Убираем активный класс у всех вкладок
                     tabs.forEach(t => t.classList.remove('active'));
@@ -722,18 +942,26 @@
             const navBtns = document.querySelectorAll('.nav-btn');
             navBtns.forEach(btn => {
                 btn.addEventListener('click', function() {
+                    if (isLoading) return;
+                    
                     const navId = this.getAttribute('data-nav');
+                    
+                    // Обновляем активную кнопку
+                    navBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
                     
                     // Показываем уведомление для неготовых разделов
                     if (navId !== 'main') {
-                        showNotification("Раздел в разработке!", "warning");
+                        showNotification("Раздел '" + navId + "' в разработке!", "warning");
                     }
                 });
             });
         }
         
         function handleClick(event) {
-            if (gameData.energy <= 0) {
+            if (isLoading || !gameData.player) return;
+            
+            if (gameData.player.energy <= 0) {
                 showNotification("❌ Недостаточно энергии!", "error");
                 return;
             }
@@ -741,17 +969,17 @@
             // Эффект клика
             createClickEffect(event);
             
-            // Обновляем игру
-            gameData.energy--;
-            gameData.totalClicks++;
+            // Обновляем данные
+            gameData.player.energy--;
+            gameData.player.total_clicks++;
             
             // Расчет награды
-            let baseReward = Math.floor(gameData.hourlyIncome / 60);
-            let reward = gameData.boostActive ? baseReward * 2 : baseReward;
+            let baseReward = Math.floor(gameData.player.hourly_income / 60);
+            let reward = gameData.player.boost_active ? baseReward * 2 : baseReward;
             reward = Math.max(1, reward);
             
-            gameData.balance += reward;
-            gameData.experience += Math.floor(reward / 2);
+            gameData.player.balance += reward;
+            gameData.player.experience += Math.floor(reward / 2);
             
             // Проверка уровня
             checkLevelUp();
@@ -766,6 +994,9 @@
             if (navigator.vibrate) {
                 navigator.vibrate(20);
             }
+            
+            // Имитируем отправку на сервер
+            simulateServerUpdate();
         }
         
         function createClickEffect(event) {
@@ -813,46 +1044,42 @@
         }
         
         function claimDaily() {
-            if (timers.daily > 0) {
-                const hours = Math.floor(timers.daily / 3600);
-                const minutes = Math.floor((timers.daily % 3600) / 60);
+            if (gameData.timers.daily > 0) {
+                const hours = Math.floor(gameData.timers.daily / 3600);
+                const minutes = Math.floor((gameData.timers.daily % 3600) / 60);
                 showNotification(`⏳ Ежедневная награда доступна через ${hours}ч ${minutes}м`, "warning");
                 return;
             }
             
-            const reward = Math.floor(Math.random() * 4000) + 1000; // 1000-5000
-            gameData.balance += reward;
-            gameData.lastDaily = Date.now();
-            
-            // Сброс таймера на 24 часа
-            timers.daily = 24 * 3600;
+            const reward = Math.floor(Math.random() * 4000) + 1000;
+            gameData.player.balance += reward;
+            gameData.timers.daily = 86400; // 24 часа
             
             showNotification(`🎁 Ежедневная награда: +${reward} MPTC!`, "success");
             updateUI();
         }
         
         function showCipherModal() {
-            if (timers.cipher > 0) {
-                const hours = Math.floor(timers.cipher / 3600);
-                const minutes = Math.floor((timers.cipher % 3600) / 60);
+            if (gameData.timers.cipher > 0) {
+                const hours = Math.floor(gameData.timers.cipher / 3600);
+                const minutes = Math.floor((gameData.timers.cipher % 3600) / 60);
                 showNotification(`⏳ Шифр доступен через ${hours}ч ${minutes}м`, "warning");
                 return;
             }
             
-            // Показываем модальное окно с шифром
             document.getElementById('cipherContent').innerHTML = `
                 <p style="margin-bottom: 15px; opacity: 0.9;">Получите шифр у бота в Telegram:</p>
                 <div style="text-align: center; margin: 20px 0;">
                     <div style="background: rgba(108, 99, 255, 0.2); padding: 20px; border-radius: 12px; font-family: monospace; font-size: 1.5em; letter-spacing: 2px; margin-bottom: 15px;">
-                        <span id="cipherCode">---</span>
+                        ABC12345
                     </div>
-                    <p style="font-size: 0.9em; opacity: 0.8; margin-bottom: 20px;">Используйте команду /cipher КОД в боте</p>
+                    <p style="font-size: 0.9em; opacity: 0.8; margin-bottom: 20px;">Используйте команду /cipher ABC12345 в боте</p>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <button class="form-btn" onclick="getCipherFromBot()" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
-                        <i class="fas fa-robot"></i> Получить шифр
+                    <button class="action-btn success" onclick="openTelegramBot()">
+                        <i class="fab fa-telegram"></i> Открыть бота
                     </button>
-                    <button class="form-btn" onclick="closeModal('cipherModal')">
+                    <button class="action-btn" onclick="closeModal('cipherModal')">
                         Закрыть
                     </button>
                 </div>
@@ -861,119 +1088,91 @@
             openModal('cipherModal');
         }
         
-        function getCipherFromBot() {
-            showNotification("Откройте бота для получения шифра", "info");
-            closeModal('cipherModal');
+        function showShopModal() {
+            // Переключаемся на вкладку магазина
+            document.querySelector('.tab[data-tab="shop"]').click();
         }
         
-        function buyBoost() {
-            if (gameData.balance < 2500) {
-                showNotification("❌ Недостаточно средств! Нужно 2500 MPTC", "error");
+        function showFriendsModal() {
+            // Переключаемся на вкладку друзей
+            document.querySelector('.tab[data-tab="friends"]').click();
+        }
+        
+        function buyItem(itemId) {
+            if (!gameData.shopItems[itemId]) {
+                showNotification("❌ Товар не найден", "error");
                 return;
             }
             
-            if (gameData.boostActive) {
-                const remaining = Math.floor((gameData.boostEnds - Date.now()) / 60000);
-                showNotification(`⏳ Буст уже активен! Осталось: ${remaining} минут`, "warning");
+            const item = gameData.shopItems[itemId];
+            
+            if (gameData.player.balance < item.price) {
+                showNotification(`❌ Недостаточно средств! Нужно ${item.price} MPTC`, "error");
                 return;
             }
             
-            gameData.balance -= 2500;
-            gameData.boostActive = true;
-            gameData.boostEnds = Date.now() + 3600000; // 1 час
+            // Покупка товара
+            gameData.player.balance -= item.price;
             
-            showNotification(`⚡ Буст активирован! Доход x2 на 60 минут!`, "success");
+            // Применяем эффект товара
+            if (item.type === 'boost') {
+                showNotification(`⚡ ${item.name} активирован!`, "success");
+                // Здесь можно добавить логику буста
+            } else if (item.type === 'energy') {
+                gameData.player.energy = Math.min(gameData.player.energy + item.amount, gameData.player.energy_max);
+                showNotification(`⚡ +${item.amount} энергии!`, "success");
+            }
+            
+            // Обновляем UI
             updateUI();
+            updateShopItems();
             
-            // Автоматическое отключение буста
-            setTimeout(() => {
-                gameData.boostActive = false;
-                showNotification("🔚 Буст завершен", "info");
-                updateUI();
-            }, 3600000);
-        }
-        
-        function showFriendModal() {
-            openModal('friendModal');
-        }
-        
-        function addFriend() {
-            const username = document.getElementById('friendUsername').value.trim();
-            
-            if (!username) {
-                showNotification("❌ Введите username друга", "error");
-                return;
-            }
-            
-            // Имитация добавления друга
-            gameData.friends++;
-            gameData.balance += 500;
-            
-            showNotification(`👥 Друг @${username} добавлен! +500 MPTC`, "success");
-            closeModal('friendModal');
-            document.getElementById('friendUsername').value = '';
-            updateUI();
-        }
-        
-        function copyReferralLink() {
-            const link = `https://t.me/MPThamstBot?start=ref_${Date.now()}`;
-            navigator.clipboard.writeText(link).then(() => {
-                showNotification("✅ Ссылка скопирована в буфер!", "success");
-            });
+            showNotification(`✅ Куплено: ${item.name}!`, "success");
         }
         
         function checkLevelUp() {
-            if (gameData.experience >= gameData.xpNeeded) {
-                gameData.level++;
-                gameData.experience -= gameData.xpNeeded;
-                gameData.xpNeeded = gameData.level * 1000;
-                gameData.hourlyIncome += gameData.level * 5;
+            if (gameData.player.experience >= gameData.player.xp_needed) {
+                gameData.player.level++;
+                gameData.player.experience -= gameData.player.xp_needed;
+                gameData.player.xp_needed = gameData.player.level * 500;
+                gameData.player.hourly_income += gameData.player.level * 10;
                 
-                // Повышение ранга каждые 5 уровней
-                if (gameData.level % 5 === 0) {
-                    gameData.rankNumber++;
-                    updateRank();
+                // Увеличиваем энергию каждые 5 уровней
+                if (gameData.player.level % 5 === 0) {
+                    gameData.player.energy_max += 20;
+                    gameData.player.rank_number++;
+                    
+                    // Обновляем ранг
+                    const ranks = [
+                        "Bronze I", "Bronze II", "Bronze III",
+                        "Silver I", "Silver II", "Silver III",
+                        "Gold I", "Gold II", "Gold III",
+                        "Platinum I", "Platinum II", "Platinum III",
+                        "Diamond I", "Diamond II", "Diamond III",
+                        "Master I", "Master II", "Master III",
+                        "Grandmaster", "Legend"
+                    ];
+                    
+                    if (gameData.player.rank_number <= ranks.length) {
+                        gameData.player.rank = ranks[gameData.player.rank_number - 1];
+                    }
                 }
                 
-                showNotification(`🎉 Уровень повышен! Теперь уровень ${gameData.level}`, "success");
-            }
-        }
-        
-        function updateRank() {
-            const ranks = [
-                "Bronze I", "Bronze II", "Bronze III",
-                "Silver I", "Silver II", "Silver III",
-                "Gold I", "Gold II", "Gold III",
-                "Platinum I", "Platinum II", "Platinum III",
-                "Diamond I", "Diamond II", "Diamond III",
-                "Master I", "Master II", "Master III",
-                "Grandmaster", "Legend"
-            ];
-            
-            if (gameData.rankNumber < ranks.length) {
-                gameData.rank = ranks[gameData.rankNumber - 1];
-            } else {
-                gameData.rank = "Legend";
-            }
-        }
-        
-        function restoreEnergy() {
-            if (gameData.energy < gameData.energyMax) {
-                gameData.energy++;
+                showNotification(`🎉 Уровень повышен! Теперь уровень ${gameData.player.level}`, "success");
                 updateUI();
             }
         }
         
         function updateTimers() {
             // Уменьшаем таймеры
-            if (timers.daily > 0) timers.daily--;
-            if (timers.cipher > 0) timers.cipher--;
-            if (timers.combo > 0) timers.combo--;
+            if (gameData.timers.daily > 0) gameData.timers.daily--;
+            if (gameData.timers.cipher > 0) gameData.timers.cipher--;
+            if (gameData.timers.combo > 0) gameData.timers.combo--;
             
             // Обновляем отображение
-            document.getElementById('dailyTimer').textContent = formatTime(timers.daily);
-            document.getElementById('cipherTimer').textContent = formatTime(timers.cipher);
-            document.getElementById('comboTimer').textContent = formatTime(timers.combo);
+            document.getElementById('dailyTimer').textContent = formatTime(gameData.timers.daily);
+            document.getElementById('cipherTimer').textContent = formatTime(gameData.timers.cipher);
+            document.getElementById('comboTimer').textContent = formatTime(gameData.timers.combo);
         }
         
         function formatTime(seconds) {
@@ -983,46 +1182,130 @@
         }
         
         function updateUI() {
+            if (!gameData.player) return;
+            
+            const player = gameData.player;
+            
             // Основная информация
-            document.getElementById('balance').textContent = gameData.balance.toLocaleString();
-            document.getElementById('hourlyIncome').textContent = `+${gameData.hourlyIncome.toLocaleString()}`;
+            document.getElementById('balance').textContent = player.balance.toLocaleString();
+            document.getElementById('hourlyIncome').textContent = `+${player.hourly_income.toLocaleString()}`;
+            document.getElementById('playerName').textContent = player.username;
             
             // Энергия
-            const energyPercent = (gameData.energy / gameData.energyMax) * 100;
+            const energyPercent = (player.energy / player.energy_max) * 100;
             document.getElementById('energyFill').style.width = energyPercent + '%';
-            document.getElementById('energyText').textContent = `${gameData.energy} / ${gameData.energyMax}`;
+            document.getElementById('energyText').textContent = `${player.energy} / ${player.energy_max}`;
             
             // Клики
-            document.getElementById('clickCount').textContent = `${gameData.totalClicks.toLocaleString()} кликов`;
+            document.getElementById('clickCount').textContent = `${player.total_clicks.toLocaleString()} кликов`;
             
             // Статистика
-            document.getElementById('statClicks').textContent = gameData.totalClicks.toLocaleString();
-            document.getElementById('statFriends').textContent = gameData.friends;
-            document.getElementById('statLevel').textContent = gameData.level;
-            document.getElementById('statRank').textContent = gameData.rank;
+            document.getElementById('statBalance').textContent = player.balance.toLocaleString();
+            document.getElementById('statClicks').textContent = player.total_clicks.toLocaleString();
+            document.getElementById('statFriends').textContent = player.friends_count;
+            document.getElementById('statLevel').textContent = player.level;
+            document.getElementById('statRank').textContent = player.rank;
+            document.getElementById('statIncome').textContent = `+${player.hourly_income.toLocaleString()}`;
             
             // XP
-            const xpPercent = (gameData.experience / gameData.xpNeeded) * 100;
+            const xpPercent = (player.experience / player.xp_needed) * 100;
             document.getElementById('xpProgress').style.width = Math.min(xpPercent, 100) + '%';
-            document.getElementById('xpText').textContent = `${gameData.experience.toLocaleString()}/${gameData.xpNeeded.toLocaleString()}`;
+            document.getElementById('xpText').textContent = `${player.experience.toLocaleString()}/${player.xp_needed.toLocaleString()}`;
             
             // Друзья
-            document.getElementById('totalFriends').textContent = gameData.friends;
+            document.getElementById('totalFriends').textContent = player.friends_count;
+            document.getElementById('referralLink').textContent = gameData.referralLink;
+            
+            // Магазин
+            document.getElementById('shopBalance').textContent = player.balance.toLocaleString();
+            
+            // Прокачка
+            document.getElementById('currentRank').textContent = player.rank;
+            document.getElementById('currentLevel').textContent = player.level;
+            document.getElementById('levelProgress').style.width = Math.min(xpPercent, 100) + '%';
+            document.getElementById('levelXP').textContent = `${player.experience.toLocaleString()}/${player.xp_needed.toLocaleString()} XP`;
+            document.getElementById('currentIncome').textContent = `+${player.hourly_income}`;
+            document.getElementById('currentEnergyMax').textContent = player.energy_max;
+            
+            const levelsToRank = 5 - (player.level % 5);
+            document.getElementById('levelsToRank').textContent = levelsToRank;
             
             // Индикатор буста
-            if (gameData.boostActive) {
-                document.querySelector('#clickArea').style.background = 'linear-gradient(135deg, #FFD700, #FFA500)';
+            if (player.boost_active) {
+                document.getElementById('clickArea').classList.add('boost');
             } else {
-                document.querySelector('#clickArea').style.background = 'linear-gradient(135deg, var(--primary), var(--secondary))';
+                document.getElementById('clickArea').classList.remove('boost');
+            }
+            
+            // Обновляем список друзей
+            updateFriendsList();
+        }
+        
+        function updateShopItems() {
+            const shopContainer = document.getElementById('shopItems');
+            if (!shopContainer) return;
+            
+            let html = '';
+            for (const [itemId, item] of Object.entries(gameData.shopItems)) {
+                const canBuy = gameData.player.balance >= item.price;
+                
+                html += `
+                    <div class="shop-item" onclick="buyItem('${itemId}')">
+                        <div class="shop-item-name">${item.name}</div>
+                        <div class="shop-item-price">${item.price.toLocaleString()} MPTC</div>
+                        <button class="shop-item-btn ${canBuy ? '' : 'disabled'}" 
+                                ${canBuy ? '' : 'disabled'}>
+                            ${canBuy ? 'КУПИТЬ' : 'НЕДОСТАТОЧНО'}
+                        </button>
+                    </div>
+                `;
+            }
+            
+            shopContainer.innerHTML = html;
+        }
+        
+        function updateFriendsList() {
+            const friendsList = document.getElementById('friendsList');
+            if (!friendsList) return;
+            
+            if (gameData.friends.length === 0) {
+                friendsList.innerHTML = `
+                    <div style="margin-bottom: 15px; opacity: 0.8;">
+                        У вас пока нет рефералов.
+                    </div>
+                    <div style="font-size: 0.9em; opacity: 0.7;">
+                        Приглашайте друзей по вашей реферальной ссылке!
+                    </div>
+                `;
+            } else {
+                let html = '<div style="text-align: left;">';
+                gameData.friends.forEach((friend, index) => {
+                    html += `
+                        <div style="margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                            <div style="font-weight: bold;">${index + 1}. @${friend.username}</div>
+                            <div style="font-size: 0.9em; opacity: 0.8;">
+                                Присоединился: ${friend.date}
+                                ${friend.reward_claimed ? '✅ Награда получена' : '⏳ Ожидает 100 кликов'}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                friendsList.innerHTML = html;
             }
         }
         
-        function loadPlayerName() {
-            // Можно получить имя из Telegram Web App или оставить по умолчанию
-            const urlParams = new URLSearchParams(window.location.search);
-            const name = urlParams.get('name') || "MPThamst Player";
-            gameData.playerName = name;
-            document.getElementById('playerName').textContent = name;
+        function copyReferralLink() {
+            navigator.clipboard.writeText(gameData.referralLink).then(() => {
+                showNotification("✅ Ссылка скопирована в буфер!", "success");
+            }).catch(err => {
+                showNotification("❌ Ошибка копирования", "error");
+            });
+        }
+        
+        function openTelegramBot() {
+            window.open('https://t.me/MPThamstBot', '_blank');
+            closeModal('cipherModal');
         }
         
         function openModal(modalId) {
@@ -1044,29 +1327,14 @@
             }, 3000);
         }
         
-        function saveGame() {
-            const saveData = {
-                ...gameData,
-                saveTime: Date.now()
-            };
-            localStorage.setItem('mpthamst_save', JSON.stringify(saveData));
+        function simulateServerUpdate() {
+            // Имитация обновления на сервере
+            // В реальности здесь будет AJAX запрос к боту
+            console.log("Данные отправлены на сервер:", gameData.player);
         }
         
-        function loadGame() {
-            const saved = localStorage.getItem('mpthamst_save');
-            if (saved) {
-                try {
-                    const loaded = JSON.parse(saved);
-                    Object.assign(gameData, loaded);
-                    
-                    // Проверяем буст
-                    if (gameData.boostActive && Date.now() > gameData.boostEnds) {
-                        gameData.boostActive = false;
-                    }
-                } catch (e) {
-                    console.log("Ошибка загрузки сохранения:", e);
-                }
-            }
+        function saveLocalData() {
+            localStorage.setItem('mpthamst_game', JSON.stringify(gameData));
         }
         
         // Добавляем CSS анимации
@@ -1082,13 +1350,9 @@
                 100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
             }
             
-            .tab-content {
-                animation: fadeIn 0.3s ease-out;
-            }
-            
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(10px); }
-                to { opacity: 1; transform: translateY(0); }
+            .disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
             }
         `;
         document.head.appendChild(style);
